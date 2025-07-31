@@ -307,11 +307,11 @@ const InteractiveTrailSelector = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="py-8">
+      <div className="py-4">
         <div className="max-w-6xl mx-auto px-6">
           {/* Error Alert */}
           {error && (
-            <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-100 rounded-2xl p-6 mb-8 shadow-sm">
+            <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-100 rounded-2xl p-6 mb-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -336,30 +336,12 @@ const InteractiveTrailSelector = () => {
             </div>
           )}
 
-          {/* Hero Header - Only show when not in group setup */}
-          {currentStep !== 'group-setup' && (
-            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-3xl shadow-2xl p-8 mb-8 text-white overflow-hidden relative">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <div className="relative z-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                    <Mountain className="text-white" size={32} />
-                  </div>
-                  <div>
-                    <h1 className="text-3xl font-bold mb-2">Trail Explorer</h1>
-                    <p className="text-blue-100 text-lg">Group-based hiking recommendations powered by advanced algorithms</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Step 1: Group Setup */}
           {currentStep === 'group-setup' && (
-            <div className="flex items-center justify-center py-6">
+            <div className="flex items-center justify-center py-4">
               <div className="max-w-4xl w-full">
                 {/* Main Title */}
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                   <h1 className="text-5xl font-bold text-gray-800 mb-4">Setup Your Group</h1>
                   <p className="text-xl text-gray-600">Create your hiking team and get personalized recommendations</p>
                 </div>
@@ -444,7 +426,7 @@ const InteractiveTrailSelector = () => {
                 </div>
                 
                 {/* Additional Info */}
-                <div className="text-center mt-8">
+                <div className="text-center mt-6">
                   <p className="text-gray-500 text-sm">
                     Powered by advanced group optimization algorithms • 243+ trails available
                   </p>
@@ -455,9 +437,9 @@ const InteractiveTrailSelector = () => {
 
           {/* Step 2: Member Preferences */}
           {currentStep === 'member-preferences' && (
-            <div className="min-h-[80vh]">
+            <div className="min-h-[70vh]">
               {/* Main Title */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 mb-4">Set Your Preferences</h1>
                 <p className="text-lg text-gray-600">Configure hiking preferences for each group member</p>
               </div>
@@ -465,8 +447,8 @@ const InteractiveTrailSelector = () => {
               {/* Main Content */}
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border border-white/30">
                 {/* Group Members Navigation */}
-                <div className="mb-8">
-                  <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
                       <User className="text-white" size={20} />
                     </div>
@@ -694,16 +676,16 @@ const InteractiveTrailSelector = () => {
 
           {/* Recommendations Display - Show alongside member preferences */}
           {recommendations.length > 0 && currentStep === 'member-preferences' && (
-            <div className="mt-8">
+            <div className="mt-6">
               {/* Main Title */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-6">
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">Current Recommendations</h2>
                 <p className="text-lg text-gray-600">Updated based on {groupMembers.filter(m => m.completed).length}/{groupMembers.length} completed preferences</p>
               </div>
               
               {/* Main Content */}
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border border-white/30">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex justify-between items-center mb-6">
                   <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
                       <TrendingUp className="text-white" size={20} />
