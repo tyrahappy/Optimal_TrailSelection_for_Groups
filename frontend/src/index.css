@@ -13,6 +13,7 @@ body {
   background-color: #ffffff;
   color: #374151;
   line-height: 1.6;
+  font-size: 1.125rem;
 }
 
 code {
@@ -71,14 +72,34 @@ code {
   padding-right: 1.5rem;
 }
 
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.px-12 {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
 
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 .py-12 {
   padding-top: 3rem;
   padding-bottom: 3rem;
+}
+
+.py-16 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 
 .p-6 {
@@ -91,6 +112,14 @@ code {
 
 .p-12 {
   padding: 3rem;
+}
+
+.p-16 {
+  padding: 4rem;
+}
+
+.p-20 {
+  padding: 5rem;
 }
 
 /* Spacing Utilities */
@@ -118,6 +147,10 @@ code {
   gap: 3rem;
 }
 
+.gap-16 {
+  gap: 4rem;
+}
+
 .space-y-2 > * + * {
   margin-top: 0.5rem;
 }
@@ -136,6 +169,10 @@ code {
 
 .space-y-8 > * + * {
   margin-top: 2rem;
+}
+
+.space-y-12 > * + * {
+  margin-top: 3rem;
 }
 
 /* Grid Layout */
@@ -238,35 +275,43 @@ code {
 }
 
 .text-xs {
-  font-size: 0.75rem;
+  font-size: 0.875rem; /* Increased from 0.75rem */
 }
 
 .text-sm {
-  font-size: 0.875rem;
+  font-size: 1rem; /* Increased from 0.875rem */
 }
 
 .text-base {
-  font-size: 1rem;
+  font-size: 1.125rem; /* Increased from 1rem */
 }
 
 .text-lg {
-  font-size: 1.125rem;
+  font-size: 1.375rem; /* Increased from 1.125rem */
 }
 
 .text-xl {
-  font-size: 1.25rem;
+  font-size: 1.5rem; /* Increased from 1.25rem */
 }
 
 .text-2xl {
-  font-size: 1.5rem;
+  font-size: 1.875rem; /* Increased from 1.5rem */
 }
 
 .text-3xl {
-  font-size: 1.875rem;
+  font-size: 2.25rem; /* Increased from 1.875rem */
 }
 
 .text-4xl {
-  font-size: 2.25rem;
+  font-size: 2.75rem; /* Increased from 2.25rem */
+}
+
+.text-5xl {
+  font-size: 3.25rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
 }
 
 .font-medium {
