@@ -1,83 +1,11 @@
+const { individualUtility } = require('./utils/groupSatisfaction');
 // Enhanced Greedy MinMax Regret Algorithm for Trail Selection
 
 /**
- * Calculate utility of a trail for a specific group member
- * @param {Object} trail - Trail object
- * @param {Object} member - Group member with preferences
- * @returns {number} - Utility score (0-1)
+ * Wrapper: methodology utility returns 0-100 → scale to 0-1 for greedy code.
  */
-const calculateMemberUtility = (trail, member) => {
-  let utility = 0;
-  
-  // Base utility from rating (0-1 scale)
-  utility += trail.rating / 5.0;
-  
-  // Process each preference type
-  member.preferences.forEach(pref => {
-    // Scenery preference matching
-    if (['mountain', 'lake', 'forest', 'ocean', 'waterfall', 'alpine'].includes(pref)) {
-      const hasMatchingScenery = trail.scenery_types.some(scenery => 
-        scenery.toLowerCase().includes(pref.toLowerCase())
-      );
-      if (hasMatchingScenery) {
-        utility += 0.3;
-      }
-    }
-    
-    // Distance preference matching
-    if (['short', 'medium', 'long'].includes(pref)) {
-      let distanceMatch = false;
-      if (pref === 'short' && trail.distance_km < 5) distanceMatch = true;
-      if (pref === 'medium' && trail.distance_km >= 5 && trail.distance_km <= 10) distanceMatch = true;
-      if (pref === 'long' && trail.distance_km > 10) distanceMatch = true;
-      
-      if (distanceMatch) {
-        utility += 0.2;
-      }
-    }
-    
-    // Elevation preference matching
-    if (['low', 'medium', 'high'].includes(pref)) {
-      let elevationMatch = false;
-      if (pref === 'low' && trail.elevation_gain_m < 200) elevationMatch = true;
-      if (pref === 'medium' && trail.elevation_gain_m >= 200 && trail.elevation_gain_m <= 500) elevationMatch = true;
-      if (pref === 'high' && trail.elevation_gain_m > 500) elevationMatch = true;
-      
-      if (elevationMatch) {
-        utility += 0.2;
-      }
-    }
-    
-    // Time preference matching
-    if (['quick', 'moderate', 'long'].includes(pref)) {
-      let timeMatch = false;
-      if (pref === 'quick' && trail.estimated_time_hours < 2) timeMatch = true;
-      if (pref === 'moderate' && trail.estimated_time_hours >= 2 && trail.estimated_time_hours <= 4) timeMatch = true;
-      if (pref === 'long' && trail.estimated_time_hours > 4) timeMatch = true;
-      
-      if (timeMatch) {
-        utility += 0.2;
-      }
-    }
-    
-    // Difficulty preference matching
-    if (['easy', 'moderate', 'hard'].includes(pref)) {
-      if (trail.difficulty.toLowerCase() === pref) {
-        utility += 0.3;
-      }
-    }
-  });
-  
-  // Difficulty bonus/penalty based on general preference
-  const difficultyScore = {
-    'Easy': 0.8,
-    'Moderate': 1.0,
-    'Hard': 0.6
-  };
-  utility += (difficultyScore[trail.difficulty] || 0.8) * 0.1;
-  
-  return Math.min(utility, 1.0); // Cap at 1.0
-};
+const calculateMemberUtility = (trail, member) =>
+  individualUtility(member, trail) / 100;
 
 /**
  * Calculate regret for a trail selection
