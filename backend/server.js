@@ -9,6 +9,8 @@ const {
   calculateMemberUtility
 } = require('./greedyMinMaxRegret');
 
+const { calculateGroupSatisfaction } = require('./utils/groupSatisfaction');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -145,7 +147,7 @@ app.get('/api/trails/filter', (req, res) => {
   res.json(filteredTrails);
 });
 
-// Get recommended trails using greedy minmax regret algorithm
+// Get recommended trails using greedy minmax regret algorithm with complete methodology
 app.post('/api/trails/recommend', (req, res) => {
   try {
     const { groupPreferences, filters = {}, k = 5 } = req.body;
@@ -153,6 +155,37 @@ app.post('/api/trails/recommend', (req, res) => {
     if (!groupPreferences || !Array.isArray(groupPreferences)) {
       return res.status(400).json({ error: 'Group preferences are required' });
     }
+    
+    // Convert simple preferences to complete methodology format
+    const groupMembers = groupPreferences.map(member => {
+      // Extract preferences from the simple format
+      const preferences = member.preferences || [];
+      
+      // Convert to complete methodology format
+      return {
+        name: member.name,
+        // Hard constraints (default values if not specified)
+        max_distance: 20, // Default 20km
+        max_elevation: 1000, // Default 1000m
+        max_time: 8, // Default 8 hours
+        acceptable_difficulties: ['Easy', 'Moderate', 'Hard'], // Default all difficulties
+        preferred_trail_types: ['Loop', 'Out & Back'], // Default all types
+        
+        // Preference weights (normalized to sum to 1.0)
+        difficulty_weight: 0.2,
+        distance_weight: 0.2,
+        time_weight: 0.2,
+        elevation_weight: 0.2,
+        trail_type_weight: 0.2,
+        
+        // Extract specific preferences
+        preferred_distance: extractPreferredDistance(preferences),
+        preferred_elevation: extractPreferredElevation(preferences),
+        preferred_time: extractPreferredTime(preferences),
+        preferred_difficulty: extractPreferredDifficulty(preferences),
+        preferred_scenery: extractPreferredScenery(preferences)
+      };
+    });
     
     // Apply filters to get candidate trails
     let candidateTrails = trailsData.filter(trail => {
@@ -193,30 +226,31 @@ app.post('/api/trails/recommend', (req, res) => {
       return true;
     });
     
-    // Run enhanced greedy minmax regret algorithm
+    // Run enhanced greedy minmax regret algorithm with complete methodology
     const algorithmOptions = {
       considerDiversity: true,
       diversityWeight: 0.3,
       regretWeight: 0.7
     };
     
-    const recommendedTrails = greedyMinMaxRegret(candidateTrails, groupPreferences, k, algorithmOptions);
+    const recommendedTrails = greedyMinMaxRegret(candidateTrails, groupMembers, k, algorithmOptions);
     
-    // Calculate comprehensive metrics
-    const metrics = calculateRecommendationMetrics(recommendedTrails, groupPreferences);
+    // Calculate comprehensive metrics using complete methodology
+    const metrics = calculateRecommendationMetrics(recommendedTrails, groupMembers);
     
     // Add individual trail metrics
     const recommendationsWithMetrics = recommendedTrails.map(trail => {
-      const groupMatch = calculateGroupMatch(trail, groupPreferences);
-      const memberUtility = groupPreferences.map(member => 
+      const groupSatisfaction = calculateGroupSatisfaction(trail, groupMembers);
+      const memberUtilities = groupMembers.map(member => 
         calculateMemberUtility(trail, member)
       );
       
       return {
         ...trail,
-        groupMatchPercentage: Math.round(groupMatch),
-        memberUtilities: memberUtility,
-        averageMemberUtility: memberUtility.reduce((a, b) => a + b, 0) / memberUtility.length
+        groupMatchPercentage: Math.round(groupSatisfaction.total_score),
+        memberUtilities: memberUtilities,
+        averageMemberUtility: memberUtilities.reduce((a, b) => a + b, 0) / memberUtilities.length,
+        groupSatisfaction: groupSatisfaction
       };
     });
     
@@ -224,7 +258,7 @@ app.post('/api/trails/recommend', (req, res) => {
       recommendations: recommendationsWithMetrics,
       metrics: metrics,
       totalCandidates: candidateTrails.length,
-      algorithm: 'Enhanced Greedy MinMax Regret',
+      algorithm: 'Enhanced Greedy MinMax Regret with Complete Methodology',
       algorithmOptions: algorithmOptions
     });
     
@@ -233,6 +267,45 @@ app.post('/api/trails/recommend', (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Helper functions to extract preferences from simple format
+function extractPreferredDistance(preferences) {
+  const distancePrefs = preferences.filter(p => ['short', 'medium', 'long'].includes(p));
+  if (distancePrefs.includes('short')) return 3;
+  if (distancePrefs.includes('medium')) return 7.5;
+  if (distancePrefs.includes('long')) return 15;
+  return 7.5; // Default medium
+}
+
+function extractPreferredElevation(preferences) {
+  const elevationPrefs = preferences.filter(p => ['low', 'medium', 'high'].includes(p));
+  if (elevationPrefs.includes('low')) return 100;
+  if (elevationPrefs.includes('medium')) return 350;
+  if (elevationPrefs.includes('high')) return 700;
+  return 350; // Default medium
+}
+
+function extractPreferredTime(preferences) {
+  const timePrefs = preferences.filter(p => ['quick', 'moderate', 'long'].includes(p));
+  if (timePrefs.includes('quick')) return 1.5;
+  if (timePrefs.includes('moderate')) return 3;
+  if (timePrefs.includes('long')) return 6;
+  return 3; // Default moderate
+}
+
+function extractPreferredDifficulty(preferences) {
+  const difficultyPrefs = preferences.filter(p => ['easy', 'moderate', 'hard'].includes(p));
+  if (difficultyPrefs.length > 0) {
+    return difficultyPrefs.map(d => d.charAt(0).toUpperCase() + d.slice(1));
+  }
+  return ['Easy', 'Moderate']; // Default
+}
+
+function extractPreferredScenery(preferences) {
+  return preferences.filter(p => 
+    ['mountain', 'lake', 'forest', 'ocean', 'waterfall', 'alpine', 'beach', 'canyon', 'glacier', 'river'].includes(p)
+  );
+}
 
 // Get all unique scenery types
 app.get('/api/scenery-types', (req, res) => {

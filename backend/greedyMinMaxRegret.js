@@ -1,96 +1,32 @@
-// Enhanced Greedy MinMax Regret Algorithm for Trail Selection
+const { 
+  gaussianPreference, 
+  individualUtility, 
+  calculateGroupSatisfaction 
+} = require('./utils/groupSatisfaction');
 
 /**
- * Calculate utility of a trail for a specific group member
+ * Calculate utility of a trail for a specific group member using complete methodology
  * @param {Object} trail - Trail object
- * @param {Object} member - Group member with preferences
- * @returns {number} - Utility score (0-1)
+ * @param {Object} member - Group member with complete preferences
+ * @returns {number} - Utility score (0-100)
  */
 const calculateMemberUtility = (trail, member) => {
-  let utility = 0;
-  
-  // Base utility from rating (0-1 scale)
-  utility += trail.rating / 5.0;
-  
-  // Process each preference type
-  member.preferences.forEach(pref => {
-    // Scenery preference matching
-    if (['mountain', 'lake', 'forest', 'ocean', 'waterfall', 'alpine'].includes(pref)) {
-      const hasMatchingScenery = trail.scenery_types.some(scenery => 
-        scenery.toLowerCase().includes(pref.toLowerCase())
-      );
-      if (hasMatchingScenery) {
-        utility += 0.3;
-      }
-    }
-    
-    // Distance preference matching
-    if (['short', 'medium', 'long'].includes(pref)) {
-      let distanceMatch = false;
-      if (pref === 'short' && trail.distance_km < 5) distanceMatch = true;
-      if (pref === 'medium' && trail.distance_km >= 5 && trail.distance_km <= 10) distanceMatch = true;
-      if (pref === 'long' && trail.distance_km > 10) distanceMatch = true;
-      
-      if (distanceMatch) {
-        utility += 0.2;
-      }
-    }
-    
-    // Elevation preference matching
-    if (['low', 'medium', 'high'].includes(pref)) {
-      let elevationMatch = false;
-      if (pref === 'low' && trail.elevation_gain_m < 200) elevationMatch = true;
-      if (pref === 'medium' && trail.elevation_gain_m >= 200 && trail.elevation_gain_m <= 500) elevationMatch = true;
-      if (pref === 'high' && trail.elevation_gain_m > 500) elevationMatch = true;
-      
-      if (elevationMatch) {
-        utility += 0.2;
-      }
-    }
-    
-    // Time preference matching
-    if (['quick', 'moderate', 'long'].includes(pref)) {
-      let timeMatch = false;
-      if (pref === 'quick' && trail.estimated_time_hours < 2) timeMatch = true;
-      if (pref === 'moderate' && trail.estimated_time_hours >= 2 && trail.estimated_time_hours <= 4) timeMatch = true;
-      if (pref === 'long' && trail.estimated_time_hours > 4) timeMatch = true;
-      
-      if (timeMatch) {
-        utility += 0.2;
-      }
-    }
-    
-    // Difficulty preference matching
-    if (['easy', 'moderate', 'hard'].includes(pref)) {
-      if (trail.difficulty.toLowerCase() === pref) {
-        utility += 0.3;
-      }
-    }
-  });
-  
-  // Difficulty bonus/penalty based on general preference
-  const difficultyScore = {
-    'Easy': 0.8,
-    'Moderate': 1.0,
-    'Hard': 0.6
-  };
-  utility += (difficultyScore[trail.difficulty] || 0.8) * 0.1;
-  
-  return Math.min(utility, 1.0); // Cap at 1.0
+  // Use the complete methodology implementation
+  return individualUtility(member, trail);
 };
 
 /**
- * Calculate regret for a trail selection
+ * Calculate regret for a trail selection using complete methodology
  * @param {Array} selectedTrails - Currently selected trails
  * @param {Array} allTrails - All available trails
- * @param {Array} groupPreferences - Group member preferences
+ * @param {Array} groupMembers - Group member preferences
  * @returns {number} - Maximum regret across all group members
  */
-const calculateRegret = (selectedTrails, allTrails, groupPreferences) => {
+const calculateRegret = (selectedTrails, allTrails, groupMembers) => {
   let maxRegret = 0;
   
   // For each group member, calculate their regret
-  groupPreferences.forEach(member => {
+  groupMembers.forEach(member => {
     // Calculate utility of selected trails for this member
     const selectedUtility = selectedTrails.reduce((sum, trail) => {
       return sum + calculateMemberUtility(trail, member);
@@ -171,14 +107,14 @@ const calculateTrailSimilarity = (trail1, trail2) => {
 };
 
 /**
- * Enhanced Greedy MinMax Regret Algorithm
+ * Enhanced Greedy MinMax Regret Algorithm with complete methodology
  * @param {Array} trails - Available trails
- * @param {Array} groupPreferences - Group member preferences
+ * @param {Array} groupMembers - Group member preferences (complete format)
  * @param {number} k - Number of trails to select
  * @param {Object} options - Algorithm options
  * @returns {Array} - Selected trails
  */
-const greedyMinMaxRegret = (trails, groupPreferences, k = 5, options = {}) => {
+const greedyMinMaxRegret = (trails, groupMembers, k = 5, options = {}) => {
   const {
     considerDiversity = true,
     diversityWeight = 0.3,
@@ -197,9 +133,9 @@ const greedyMinMaxRegret = (trails, groupPreferences, k = 5, options = {}) => {
       const candidateTrail = availableTrails[j];
       const candidateSelection = [...selectedTrails, candidateTrail];
       
-      // Calculate regret score
-      const regretScore = calculateRegret(candidateSelection, trails, groupPreferences);
-      const normalizedRegret = 1 - (regretScore / (groupPreferences.length * k)); // Normalize to 0-1
+      // Calculate regret score using complete methodology
+      const regretScore = calculateRegret(candidateSelection, trails, groupMembers);
+      const normalizedRegret = 1 - (regretScore / (groupMembers.length * k * 100)); // Normalize to 0-1
       
       // Calculate diversity score
       const diversityScore = considerDiversity ? calculateDiversity(candidateSelection) : 0;
@@ -228,12 +164,12 @@ const greedyMinMaxRegret = (trails, groupPreferences, k = 5, options = {}) => {
 };
 
 /**
- * Calculate comprehensive metrics for trail recommendations
+ * Calculate comprehensive metrics for trail recommendations using complete methodology
  * @param {Array} selectedTrails - Selected trails
- * @param {Array} groupPreferences - Group preferences
+ * @param {Array} groupMembers - Group members with complete preferences
  * @returns {Object} - Metrics object
  */
-const calculateRecommendationMetrics = (selectedTrails, groupPreferences) => {
+const calculateRecommendationMetrics = (selectedTrails, groupMembers) => {
   const metrics = {
     totalTrails: selectedTrails.length,
     averageRating: 0,
@@ -244,7 +180,12 @@ const calculateRecommendationMetrics = (selectedTrails, groupPreferences) => {
     diversityScore: 0,
     regretScore: 0,
     difficultyDistribution: {},
-    sceneryTypeDistribution: {}
+    sceneryTypeDistribution: {},
+    // New metrics from complete methodology
+    averageGroupSatisfaction: 0,
+    fairnessScore: 0,
+    consensusDegree: 0,
+    controversyLevel: 0
   };
   
   if (selectedTrails.length === 0) return metrics;
@@ -255,21 +196,28 @@ const calculateRecommendationMetrics = (selectedTrails, groupPreferences) => {
   metrics.averageTime = selectedTrails.reduce((sum, t) => sum + t.estimated_time_hours, 0) / selectedTrails.length;
   metrics.averageElevation = selectedTrails.reduce((sum, t) => sum + t.elevation_gain_m, 0) / selectedTrails.length;
   
+  // Calculate group satisfaction metrics using complete methodology
+  const groupSatisfactionScores = selectedTrails.map(trail => 
+    calculateGroupSatisfaction(trail, groupMembers)
+  );
+  
+  metrics.averageGroupSatisfaction = groupSatisfactionScores.reduce((sum, g) => sum + g.avg_satisfaction, 0) / selectedTrails.length;
+  metrics.fairnessScore = groupSatisfactionScores.reduce((sum, g) => sum + g.fairness_score, 0) / selectedTrails.length;
+  metrics.consensusDegree = groupSatisfactionScores.reduce((sum, g) => sum + g.consensus_degree, 0) / selectedTrails.length;
+  metrics.controversyLevel = groupSatisfactionScores.reduce((sum, g) => sum + g.controversy_level, 0) / selectedTrails.length;
+  
   // Calculate group match percentages
-  metrics.groupMatchPercentages = groupPreferences.map(member => {
-    const matchingTrails = selectedTrails.filter(trail =>
-      member.preferences.some(pref =>
-        trail.scenery_types.some(scenery => 
-          scenery.toLowerCase().includes(pref.toLowerCase())
-        )
-      )
-    );
+  metrics.groupMatchPercentages = groupMembers.map(member => {
+    const matchingTrails = selectedTrails.filter(trail => {
+      const utility = calculateMemberUtility(trail, member);
+      return utility > 50; // Consider trails with >50% utility as matching
+    });
     return Math.round((matchingTrails.length / selectedTrails.length) * 100);
   });
   
   // Calculate diversity and regret
   metrics.diversityScore = calculateDiversity(selectedTrails);
-  metrics.regretScore = calculateRegret(selectedTrails, selectedTrails, groupPreferences);
+  metrics.regretScore = calculateRegret(selectedTrails, selectedTrails, groupMembers);
   
   // Calculate distributions
   selectedTrails.forEach(trail => {
