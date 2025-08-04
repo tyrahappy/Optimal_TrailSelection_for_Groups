@@ -1,0 +1,4 @@
+frontend/node_modules/.cache/
+backend/.DS_Store
+frontend/node_modules/
+*.DS_Store
