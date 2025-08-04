@@ -2,6 +2,12 @@
 
 A comprehensive dataset of 243 hiking trails in the Pacific Northwest region, designed for developing and evaluating group trail recommendation algorithms. The dataset covers the Greater Vancouver Area, British Columbia, and adjacent areas of Washington State.
 
+## CSV Data Workflow
+
+![CSV Workflow Diagram](Untitled%20diagram%20_%20Mermaid%20Chart-2025-07-25-224114%202.png)
+
+*CSV data processing workflow showing the complete pipeline from data collection to final dataset preparation.*
+
 ## Dataset Overview
 
 ### Geographic Coverage
@@ -92,6 +98,9 @@ This dataset was collected using the [AllTrails MCP Server](https://github.com/s
 3. **Data Extraction**: Retrieved structured JSON data via the MCP server
 4. **Format Conversion**: Converted JSON responses to CSV format
 5. **Quality Processing**: Applied comprehensive cleaning and validation pipeline
+
+### Workflow Overview
+The CSV workflow diagram above illustrates the complete data processing pipeline, from initial data collection through final dataset preparation. This systematic approach ensures data quality and consistency across all 243 trail records.
 
 ### Key Collection Parameters
 - **Target Areas**: Vancouver metro, Squamish, Washington State borders
