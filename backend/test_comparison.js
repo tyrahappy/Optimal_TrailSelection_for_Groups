@@ -440,28 +440,3 @@ scenarios.forEach((scenario, scenarioIndex) => {
   
   console.log("\n" + "=".repeat(80));
 });
-
-// Overall analysis
-console.log("\n=== OVERALL ANALYSIS ===");
-console.log("Algorithm Comparison Summary:");
-console.log("1. Greedy MinMax Regret: Focuses on minimizing maximum regret across group members");
-console.log("2. Pareto Weighted Scoring: Uses Pareto frontier + weighted scoring for optimal balance");
-console.log("3. Key Differences:");
-console.log("   - Greedy: Better for diverse preferences, minimizes worst-case scenarios");
-console.log("   - Pareto: Better for similar preferences, optimizes overall group satisfaction");
-console.log("   - Overlap: Measures how often both algorithms agree on trail selection");
-console.log("   - Metrics: Compare diversity, regret, satisfaction, and fairness scores");
-
-console.log("\n=== GROUP-SPECIFIC RECOMMENDATIONS ===");
-console.log("• Family Groups:");
-console.log("  - Greedy MinMax Regret: Better for diverse ages and safety concerns");
-console.log("  - Pareto Weighted Scoring: Better when family has similar interests");
-console.log("  - Key factors: Safety, accessibility, fairness across ages");
-console.log("• Friends Groups:");
-console.log("  - Pareto Weighted Scoring: Better for similar interests and consensus");
-console.log("  - Greedy MinMax Regret: Better when friends have diverse preferences");
-console.log("  - Key factors: Compromise, shared experiences, group dynamics");
-console.log("• Expert Groups:");
-console.log("  - Greedy MinMax Regret: Better for diverse expert preferences");
-console.log("  - Pareto Weighted Scoring: Better for optimizing overall experience");
-console.log("  - Key factors: Technical difficulty, specialized interests, challenge level"); 

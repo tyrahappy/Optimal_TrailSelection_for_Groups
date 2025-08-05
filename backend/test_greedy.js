@@ -302,24 +302,3 @@ scenarios.forEach((scenario, scenarioIndex) => {
 
   console.log("\n" + "=".repeat(60));
 });
-
-// Algorithm analysis
-console.log("\n=== Algorithm Analysis ===");
-console.log("The Greedy MinMax Regret algorithm demonstrates:");
-console.log("1. Minimizes maximum regret across all group members");
-console.log("2. Considers trail diversity to avoid similar selections");
-console.log("3. Balances individual preferences with group satisfaction");
-console.log("4. Provides comprehensive metrics for decision making");
-console.log("5. Adapts to different group preference scenarios");
-
-console.log("\n=== Key Features ===");
-console.log("• Utility Calculation: Considers rating, preference matching, and difficulty");
-console.log("• Regret Minimization: Finds trails that minimize maximum group regret");
-console.log("• Diversity Optimization: Ensures selected trails are diverse");
-console.log("• Comprehensive Metrics: Provides detailed statistics and analysis");
-console.log("• Scalable: Handles multiple group members and large trail datasets");
-
-console.log("\n=== Performance ===");
-console.log("• Time Complexity: O(k * n * m) where k=trails to select, n=total trails, m=group size");
-console.log("• Space Complexity: O(n) for storing trail data");
-console.log("• Scalability: Efficiently handles 200+ trails and multiple group members");
