@@ -169,14 +169,12 @@ app.post('/api/trails/recommend', (req, res) => {
         max_elevation: 1000, // Default 1000m
         max_time: 8, // Default 8 hours
         acceptable_difficulties: ['Easy', 'Moderate', 'Hard'], // Default all difficulties
-        preferred_trail_types: ['Loop', 'Out & Back'], // Default all types
         
         // Preference weights (normalized to sum to 1.0)
-        difficulty_weight: 0.2,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        trail_type_weight: 0.2,
+        difficulty_weight: 0.25,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
         
         // Extract specific preferences
         preferred_distance: extractPreferredDistance(preferences),

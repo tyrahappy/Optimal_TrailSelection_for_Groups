@@ -27,15 +27,14 @@ function loadTrails() {
 const group = [
   {
     acceptable_difficulties: ['Easy', 'Moderate'],
-    preferred_trail_types: ['Loop', 'Out & Back'],
+  
     preferred_distance: 8,     // km
     max_time: 4,               // hours
     max_elevation: 600,        // meters
-    distance_weight: 0.2,
-    time_weight: 0.2,
-    elevation_weight: 0.2,
-    difficulty_weight: 0.2,
-    trail_type_weight: 0.2
+    distance_weight: 0.25,
+    time_weight: 0.25,
+    elevation_weight: 0.25,
+    difficulty_weight: 0.25
   }
 ];
 

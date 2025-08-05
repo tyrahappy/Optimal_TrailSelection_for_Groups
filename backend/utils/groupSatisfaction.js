@@ -23,8 +23,7 @@ function individualUtility(member, trail) {
     : 0;
   u += member.elevation_weight * elevScore;
 
-  const typeScore = member.preferred_trail_types.includes(trail.trail_type) ? 100 : 60;
-  u += member.trail_type_weight * typeScore;
+  // Removed trail type scoring as it's not part of our evaluation criteria
 
   return Math.min(100, u);
 }

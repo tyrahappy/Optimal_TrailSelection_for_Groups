@@ -11,43 +11,37 @@ const scenarios = [
       {
         name: "Alice",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 8,
         max_time: 4,
         max_elevation: 600,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["mountain", "lake", "waterfall"]
       },
       {
         name: "Bob",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 6,
         max_time: 3,
         max_elevation: 400,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["ocean", "beach", "lake"]
       },
       {
         name: "Carol",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 10,
         max_time: 5,
         max_elevation: 800,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["forest", "waterfall", "lake"]
       }
     ]
@@ -59,43 +53,37 @@ const scenarios = [
       {
         name: "Alice",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 8,
         max_time: 4,
         max_elevation: 600,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["lake", "mountain", "forest"]
       },
       {
         name: "Bob",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 6,
         max_time: 3,
         max_elevation: 400,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["lake", "ocean", "beach"]
       },
       {
         name: "Carol",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 10,
         max_time: 5,
         max_elevation: 800,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["lake", "waterfall", "forest"]
       }
     ]
@@ -107,50 +95,44 @@ const scenarios = [
       {
         name: "Alice",
         acceptable_difficulties: ['Easy', 'Moderate', 'Hard'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 12,
         max_time: 6,
         max_elevation: 1000,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["mountain", "alpine", "glacier"]
       },
       {
         name: "Bob",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 6,
         max_time: 3,
         max_elevation: 400,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["ocean", "beach", "city"]
       },
       {
         name: "Carol",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_trail_types: ['Loop', 'Out & Back'],
         preferred_distance: 8,
         max_time: 4,
         max_elevation: 600,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        trail_type_weight: 0.2,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
         preferences: ["forest", "lake", "mountain"]
       }
     ]
   }
 ];
 
-// Simulate trail data (based on real data)
+// Same sample trails as before
 const sampleTrails = [
   {
     trail_id: "BC_001",
@@ -340,4 +322,4 @@ console.log("• Scalable: Handles multiple group members and large trail datase
 console.log("\n=== Performance ===");
 console.log("• Time Complexity: O(k * n * m) where k=trails to select, n=total trails, m=group size");
 console.log("• Space Complexity: O(n) for storing trail data");
-console.log("• Scalability: Efficiently handles 200+ trails and multiple group members"); 
+console.log("• Scalability: Efficiently handles 200+ trails and multiple group members");
