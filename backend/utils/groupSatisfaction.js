@@ -4,6 +4,16 @@ function gaussianPreference(actual, preferred, tolerance = 0.3) {
   return Math.exp(-(d ** 2) / (2 * tolerance ** 2));
 }
 
+// --- scenery overlap helper -----
+function sceneryMatchScore(trailScenery, preferredScenery) {
+  const A = new Set(trailScenery.map(s => s.toLowerCase()));
+  const B = new Set(preferredScenery.map(s => s.toLowerCase()));
+  const inter = [...A].filter(x => B.has(x)).length;
+  const union = new Set([...A, ...B]).size;
+  return union === 0 ? 0 : inter / union;        // Jaccard ∈ [0,1]
+}
+
+
 function individualUtility(member, trail) {
   let u = 0;
 
@@ -23,7 +33,11 @@ function individualUtility(member, trail) {
     : 0;
   u += member.elevation_weight * elevScore;
 
-  // Removed trail type scoring as it's not part of our evaluation criteria
+  // scenery types match
+  if (member.preferred_scenery_types && member.preferred_scenery_types.length) {
+    const scenScore = sceneryMatchScore(trail.scenery_types, member.preferred_scenery_types) * 100;
+    u += member.scenery_weight * scenScore;
+  }
 
   return Math.min(100, u);
 }
