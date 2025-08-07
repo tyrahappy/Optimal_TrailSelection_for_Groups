@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, MapPin, Clock, Mountain, Star, Users, Eye, Zap, TrendingUp, AlertCircle, RefreshCw, Heart, Activity, Award, ChevronDown, X, Plus, User, Settings, ArrowRight, ArrowLeft, Home, CheckCircle } from 'lucide-react';
 
+/**
+ * InteractiveTrailSelector - Main component for trail recommendation system
+ * Provides a multi-step interface for group preference collection and trail recommendations
+ * Features: Group setup, member preference collection, algorithm-based recommendations
+ */
 const InteractiveTrailSelector = () => {
+  // Core application states
   const [trails, setTrails] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +27,7 @@ const InteractiveTrailSelector = () => {
     scenery: []
   });
 
-  // Preference options
+  // Preference options for UI selection
   const preferenceOptions = {
     distance: ['Short (< 5km)', 'Medium (5-10km)', 'Long (> 10km)'],
     elevation: ['Low (< 200m)', 'Medium (200-500m)', 'High (> 500m)'],
@@ -30,20 +36,24 @@ const InteractiveTrailSelector = () => {
     scenery: ['Mountain', 'Lake', 'Forest', 'Ocean', 'Waterfall', 'Alpine', 'Beach', 'Canyon', 'Glacier', 'River']
   };
 
-  // Load trail data from backend
+  /**
+   * Load trail data from backend API
+   * Fetches and processes trail data on component mount
+   */
   useEffect(() => {
     const loadTrails = async () => {
       setDataLoading(true);
       setError(null);
       
       try {
-        console.log('🔍 正在从后端加载步道数据...');
+        console.log('🔍 Loading trail data from backend...');
         const response = await fetch('http://localhost:3001/api/trails');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         
+        // Process and normalize trail data
         const processedData = data.map(trail => ({
           ...trail,
           distance_km: parseFloat(trail.distance_km),
@@ -58,9 +68,9 @@ const InteractiveTrailSelector = () => {
         }));
         
         setTrails(processedData);
-        console.log(`✅ 成功加载 ${processedData.length} 条步道数据`);
+        console.log(`✅ Successfully loaded ${processedData.length} trail records`);
       } catch (err) {
-        console.error('❌ 加载步道数据失败:', err);
+        console.error('❌ Failed to load trail data:', err);
         setError(`Failed to load trails: ${err.message}`);
       } finally {
         setDataLoading(false);
@@ -70,7 +80,10 @@ const InteractiveTrailSelector = () => {
     loadTrails();
   }, []);
 
-  // Initialize group members
+  /**
+   * Initialize group members with default preferences
+   * Creates member objects based on group size and resets to preference collection step
+   */
   const initializeGroup = () => {
     const members = [];
     for (let i = 0; i < groupSize; i++) {
