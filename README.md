@@ -7,13 +7,15 @@ A sophisticated trail recommendation system that uses advanced algorithms to fin
 ### 🤖 **Dual Algorithm System**
 - **Greedy MinMax Regret**: Minimizes maximum regret across all group members
 - **Pareto Weighted Scoring**: Uses Pareto frontier + weighted scoring for optimal balance
-- **Algorithm Comparison**: Built-in comparison tools for different group scenarios
+- **Complete Methodology**: Individual utility functions with 5-criteria evaluation
+- **Group Satisfaction Model**: Combines average satisfaction, fairness, and consensus metrics
+- **Social Choice Theory**: Grounded in multi-attribute decision-making principles
 
-### 📊 **Complete Methodology Implementation**
+### 📊 **Comprehensive Evaluation System**
 - **Individual Utility Function**: 5-criteria utility based on difficulty, distance, time, elevation, and preferences
 - **Gaussian Preference Function**: Sophisticated distance preference modeling
 - **Group Satisfaction Model**: Combines average satisfaction, fairness, consensus, and controversy metrics
-- **Social Choice Theory**: Grounded in multi-attribute decision-making principles
+- **Diversity Enhancement**: Ensures varied trail selections for better group experience
 
 ### 👥 **Group-Specific Scenarios**
 - **Family Groups**: Diverse ages and fitness levels (parents, children, grandparents)
@@ -23,7 +25,7 @@ A sophisticated trail recommendation system that uses advanced algorithms to fin
 ### 🎨 **Modern Web Interface**
 - **React Frontend**: Interactive group setup and preference collection
 - **Real-time Recommendations**: Instant trail suggestions with detailed metrics
-- **Responsive Design**: Works on desktop and mobile devices
+- **Responsive Design**: Works on desktop devices
 - **Orange Gradient Theme**: Beautiful and modern UI
 
 ## 🚀 Quick Start
@@ -66,14 +68,14 @@ Optimal_TrailSelection_for_Groups/
 │   │   ├── van_wa_200_sorted.csv  # 200+ Pacific Northwest trails
 │   │   └── README.md
 │   ├── 📁 utils/
-│   │   ├── groupSatisfaction.js   # Complete methodology
+│   │   ├── groupSatisfaction.js   # Core methodology
 │   │   └── normalize.js           # Data normalization
-│   ├── server.js                  # Express server
+│   ├── server.js                  # Express server with simplified API
 │   ├── greedyMinMaxRegret.js      # Greedy algorithm
 │   ├── paretoWeightedScoring.js   # Pareto algorithm
-│   ├── test_comparison.js         # Algorithm comparison
 │   ├── test_greedy.js            # Greedy testing
 │   ├── test_pareto.js            # Pareto testing
+│   ├── test_comparison.js        # Algorithm comparison
 │   └── package.json
 │
 ├── start.sh                       # One-click start
@@ -85,42 +87,110 @@ Optimal_TrailSelection_for_Groups/
 ### Greedy MinMax Regret Algorithm
 **Best for**: Diverse preferences, fairness-focused groups
 
-1. **Utility Calculation**: Individual satisfaction based on 5 criteria
-2. **Regret Minimization**: Finds trails that minimize maximum group regret
-3. **Diversity Enhancement**: Ensures varied trail selections
-4. **Iterative Selection**: Greedy approach for optimal combination
+**Core Principle**: Minimizes the maximum regret across all group members by iteratively selecting trails that reduce the worst-case dissatisfaction.
+
+**Algorithm Steps**:
+1. **Individual Utility Calculation**: Each member's satisfaction based on 5 criteria
+2. **Regret Computation**: Calculate potential regret for each candidate trail
+3. **Greedy Selection**: Choose trail that minimizes maximum group regret
+4. **Diversity Enhancement**: Optional diversity consideration for varied selections
+5. **Iterative Process**: Repeat until k trails are selected
+
+**Key Features**:
+- **Regret Minimization**: Ensures no member is severely dissatisfied
+- **Diversity Control**: Optional similarity-based diversity scoring
+- **Adaptive Weights**: Configurable regret vs diversity balance
+- **Scalable**: O(k × n × m) time complexity
 
 ### Pareto Weighted Scoring Algorithm
 **Best for**: Similar preferences, consensus-building groups
 
-1. **Pareto Frontier**: Identifies non-dominated solutions
-2. **Weighted Scoring**: Applies methodology weights to Pareto set
-3. **Multi-objective Optimization**: Balances multiple criteria
-4. **Consensus Building**: Optimizes for group agreement
+**Core Principle**: Uses Pareto frontier to identify non-dominated solutions, then applies weighted scoring for final selection.
 
-### Complete Methodology
+**Algorithm Steps**:
+1. **Pareto Frontier**: Identify non-dominated solutions using multi-objective optimization
+2. **Objective Vector**: 6-dimensional evaluation (satisfaction, fairness, accessibility, distance, time, consensus)
+3. **Dominance Check**: Solution A dominates B if A ≥ B on all objectives and A > B on at least one
+4. **Weighted Scoring**: Apply methodology weights to Pareto set
+5. **Final Selection**: Choose top-k trails from weighted Pareto set
+
+**Key Features**:
+- **Multi-Objective**: Balances multiple conflicting objectives
+- **Pareto Optimal**: Guarantees no dominated solutions
+- **Consensus Focus**: Optimizes for group agreement
+- **Methodology Aligned**: Uses same weights as satisfaction model
+
+### Complete Methodology Implementation
+
+**Individual Utility Function** (0-100 scale):
 ```javascript
-// Individual Utility Function (0-100 scale)
 utility = difficulty_score + distance_score + time_score + 
           elevation_score + preference_score
+```
 
-// Group Satisfaction Model
+**Group Satisfaction Model**:
+```javascript
 group_score = 0.4 * avg_satisfaction + 
               0.3 * fairness_score + 
               0.3 * consensus_degree
 ```
 
+**Pareto Objective Vector** (6-dimensional):
+```javascript
+objectives = [
+  avg_satisfaction,      // Average group satisfaction
+  fairness_score,        // Minimum member satisfaction
+  accessibility,         // Difficulty-based accessibility
+  distance_score,        // Normalized distance preference
+  time_score,           // Normalized time preference
+  consensus_degree       // Group agreement level
+]
+```
+
+**Algorithm Comparison**:
+| Aspect | Greedy MinMax Regret | Pareto Weighted Scoring |
+|--------|----------------------|-------------------------|
+| **Focus** | Fairness & Regret Minimization | Consensus & Multi-objective |
+| **Complexity** | O(k × m x n² × logn) | O(n² × m) |
+
+### Implementation Examples
+
+**Greedy MinMax Regret Usage**:
+```javascript
+const { greedyMinMaxRegret } = require('./greedyMinMaxRegret');
+
+const options = {
+  considerDiversity: true,
+  diversityWeight: 0.3,
+  regretWeight: 0.7
+};
+
+const recommendations = greedyMinMaxRegret(trails, groupMembers, 5, options);
+```
+
+**Pareto Weighted Scoring Usage**:
+```javascript
+const { selectParetoK } = require('./paretoWeightedScoring');
+
+const weights = {
+  avg: 0.4,    // Average satisfaction weight
+  min: 0.3,    // Fairness score weight
+  cons: 0.3    // Consensus degree weight
+};
+
+const recommendations = selectParetoK(trails, groupMembers, 5, weights);
+```
+
 ## 📊 Performance Metrics
 
-### Algorithm Comparison Metrics
-- **Average Rating**: Trail quality assessment
-- **Average Distance**: Physical accessibility
-- **Diversity Score**: Trail variety percentage
-- **Regret Score**: Maximum group dissatisfaction
-- **Average Satisfaction**: Overall group happiness
-- **Fairness Score**: Minimum member satisfaction
-- **Consensus Degree**: Group agreement level
-- **Controversy Level**: Preference variance
+### Algorithm Metrics
+- **Average Rating**: Trail quality assessment (1-5 stars)
+- **Average Distance**: Physical accessibility (km)
+- **Average Satisfaction**: Overall group happiness (0-100%)
+- **Fairness Score**: Minimum member satisfaction (0-100%)
+- **Consensus Degree**: Group agreement level (0-100%)
+- **Diversity Score**: Trail variety percentage (0-100%)
+- **Regret Score**: Maximum group dissatisfaction (0-100%)
 
 ### Group-Specific Recommendations
 - **Family**: Safety, accessibility, fairness across ages
@@ -163,8 +233,11 @@ node test_comparison.js
 ## 🔧 API Endpoints
 
 ### Core Endpoints
-- `GET /api/trails` - Get all trails with filtering
+- `GET /api/trails` - Get all trails
+- `GET /api/trails/filter` - Get filtered trails
 - `POST /api/trails/recommend` - Get group recommendations
+- `GET /api/scenery-types` - Get all scenery types
+- `GET /api/trails/stats` - Get trail statistics
 - `GET /api/health` - Server health check
 
 ### Filtering Options
@@ -185,7 +258,7 @@ node test_comparison.js
 - **Trail Cards**: Detailed trail information
 - **Metrics Dashboard**: Algorithm performance metrics
 - **Group Satisfaction**: Individual and collective scores
-- **Comparison View**: Side-by-side algorithm results
+- **Real-time Updates**: Instant recommendation updates
 
 ## 🚀 Future Enhancements
 
@@ -213,14 +286,6 @@ This project implements advanced concepts from:
 - **Pareto Optimality**: Multi-objective optimization
 - **Regret Minimization**: Worst-case scenario optimization
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
 ## 📄 License
 
 MIT License - see LICENSE file for details
@@ -231,7 +296,3 @@ MIT License - see LICENSE file for details
 - **React Community**: Frontend framework and ecosystem
 - **Node.js Community**: Backend runtime and packages
 - **Academic Research**: Social choice theory and group decision-making
-
----
-
-**Built with ❤️ for outdoor enthusiasts and group adventure planning** 
