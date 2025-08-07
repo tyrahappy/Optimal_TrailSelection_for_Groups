@@ -3,11 +3,8 @@ const cors = require('cors');
 const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
-const {
-  greedyMinMaxRegret,
-  calculateRecommendationMetrics,
-  calculateMemberUtility
-} = require('./greedyMinMaxRegret');
+const { greedyMinMaxRegret } = require('./greedyMinMaxRegret');
+
 
 const { calculateGroupSatisfaction } = require('./utils/groupSatisfaction');
 
@@ -233,28 +230,17 @@ app.post('/api/trails/recommend', (req, res) => {
     
     const recommendedTrails = greedyMinMaxRegret(candidateTrails, groupMembers, k, algorithmOptions);
     
-    // Calculate comprehensive metrics using complete methodology
-    const metrics = calculateRecommendationMetrics(recommendedTrails, groupMembers);
-    
-    // Add individual trail metrics
-    const recommendationsWithMetrics = recommendedTrails.map(trail => {
-      const groupSatisfaction = calculateGroupSatisfaction(trail, groupMembers);
-      const memberUtilities = groupMembers.map(member => 
-        calculateMemberUtility(trail, member)
-      );
-      
+    // Add basic trail information for frontend
+    const recommendationsWithBasicInfo = recommendedTrails.map(trail => {
       return {
         ...trail,
-        groupMatchPercentage: Math.round(groupSatisfaction.total_score),
-        memberUtilities: memberUtilities,
-        averageMemberUtility: memberUtilities.reduce((a, b) => a + b, 0) / memberUtilities.length,
-        groupSatisfaction: groupSatisfaction
+        // Add any basic info the frontend might need
+        groupMatchPercentage: Math.round(calculateGroupSatisfaction(trail, groupMembers).total_score)
       };
     });
     
     res.json({
-      recommendations: recommendationsWithMetrics,
-      metrics: metrics,
+      recommendations: recommendationsWithBasicInfo,
       totalCandidates: candidateTrails.length,
       algorithm: 'Enhanced Greedy MinMax Regret with Complete Methodology',
       algorithmOptions: algorithmOptions
