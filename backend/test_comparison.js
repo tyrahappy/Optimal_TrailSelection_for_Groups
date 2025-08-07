@@ -163,9 +163,9 @@ const scenarios = [
       {
         name: "Teenager",
         acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 8,
-        max_time: 4,
-        max_elevation: 500,
+        preferred_distance: 2,
+        max_time: 1,
+        max_elevation: 250,
         distance_weight: 0.2,
         time_weight: 0.2,
         elevation_weight: 0.25,
@@ -308,9 +308,7 @@ const scenarios = [
 
 // Algorithm options
 const greedyOptions = {
-  considerDiversity: true,
-  diversityWeight: 0.3,
-  regretWeight: 0.7
+  returnOnlyTrails: false  // Get full result with regret information
 };
 
 const paretoOptions = {
@@ -435,8 +433,11 @@ scenarios.forEach((scenario, scenarioIndex) => {
   });
   
   // Run both algorithms
-  const greedyResults = greedyMinMaxRegret(sampleTrails, scenario.groupPreferences, 5, greedyOptions);
+  const greedyResult = greedyMinMaxRegret(sampleTrails, scenario.groupPreferences, 5, greedyOptions);
   const paretoResults = selectParetoK(sampleTrails, scenario.groupPreferences, 5, paretoOptions);
+  
+  // Extract trails from greedy result (handle both array and object return types)
+  const greedyResults = Array.isArray(greedyResult) ? greedyResult : greedyResult.selectedTrails;
   
   // Compare results using direct utils calculations
   const comparison = compareAlgorithms(greedyResults, paretoResults, scenario, scenario.groupPreferences);
@@ -455,6 +456,11 @@ scenarios.forEach((scenario, scenarioIndex) => {
   
   console.log("\n   === METRICS COMPARISON ===");
   console.log(`   Overlap: ${comparison.overlap.count}/5 trails (${(comparison.overlap.count/5*100).toFixed(0)}%)`);
+  
+  // Add regret information if available
+  if (!Array.isArray(greedyResult) && greedyResult.maxRegret !== undefined) {
+    console.log(`   - Greedy Max Regret: ${greedyResult.maxRegret}`);
+  }
   
   console.log("\n   Greedy Metrics:");
   console.log(`   - Average Rating: ${comparison.greedyMetrics.averageRating.toFixed(1)}/5.0`);
