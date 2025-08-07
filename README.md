@@ -70,11 +70,10 @@ Optimal_TrailSelection_for_Groups/
 │   ├── 📁 utils/
 │   │   ├── groupSatisfaction.js   # Core methodology
 │   │   └── normalize.js           # Data normalization
-│   ├── server.js                  # Express server with simplified API
-│   ├── greedyMinMaxRegret.js      # Greedy algorithm
+│   ├── server.js                  # Express server with API endpoints
+│   ├── greedyMinMaxRegret.js      # Simplified Greedy algorithm
 │   ├── paretoWeightedScoring.js   # Pareto algorithm
 │   ├── test_greedy.js            # Greedy testing
-│   ├── test_pareto.js            # Pareto testing
 │   ├── test_comparison.js        # Algorithm comparison
 │   └── package.json
 │
@@ -83,6 +82,20 @@ Optimal_TrailSelection_for_Groups/
 ```
 
 ## 🧮 Algorithm Details
+
+### Recent Algorithm Improvements
+
+**Greedy MinMax Regret Refinement**:
+- **Simplified Core Logic**: Removed diversity considerations to focus purely on regret minimization
+- **Clean Return Structure**: Returns both trails array and detailed metrics object
+- **Enhanced Performance**: Streamlined implementation for better efficiency
+- **Core Metric Focus**: Emphasizes maximum regret as the primary optimization target
+
+**Key Changes**:
+- Removed `calculateDiversity` and `calculateTrailSimilarity` functions
+- Simplified `greedyMinMaxRegret` to focus on pure regret minimization
+- Added `returnOnlyTrails` option for backward compatibility
+- Enhanced return object with algorithm metadata
 
 ### Greedy MinMax Regret Algorithm
 **Best for**: Diverse preferences, fairness-focused groups
@@ -93,14 +106,13 @@ Optimal_TrailSelection_for_Groups/
 1. **Individual Utility Calculation**: Each member's satisfaction based on 5 criteria
 2. **Regret Computation**: Calculate potential regret for each candidate trail
 3. **Greedy Selection**: Choose trail that minimizes maximum group regret
-4. **Diversity Enhancement**: Optional diversity consideration for varied selections
-5. **Iterative Process**: Repeat until k trails are selected
+4. **Iterative Process**: Repeat until k trails are selected
 
 **Key Features**:
-- **Regret Minimization**: Ensures no member is severely dissatisfied
-- **Diversity Control**: Optional similarity-based diversity scoring
-- **Adaptive Weights**: Configurable regret vs diversity balance
-- **Scalable**: O(k × n × m) time complexity
+- **Pure Regret Minimization**: Focuses solely on minimizing maximum regret
+- **Simple and Efficient**: Clean implementation without complexity overhead
+- **Scalable**: O(k × m x n² × logn) time complexity
+- **Fairness Guarantee**: Ensures no member is severely dissatisfied
 
 ### Pareto Weighted Scoring Algorithm
 **Best for**: Similar preferences, consensus-building groups
@@ -159,13 +171,15 @@ objectives = [
 ```javascript
 const { greedyMinMaxRegret } = require('./greedyMinMaxRegret');
 
-const options = {
-  considerDiversity: true,
-  diversityWeight: 0.3,
-  regretWeight: 0.7
-};
+// Simple usage - returns selected trails
+const trails = greedyMinMaxRegret(trails, groupMembers, 5, { returnOnlyTrails: true });
 
-const recommendations = greedyMinMaxRegret(trails, groupMembers, 5, options);
+// Full usage - returns detailed results
+const result = greedyMinMaxRegret(trails, groupMembers, 5);
+console.log(result.selectedTrails);  // Selected trails
+console.log(result.maxRegret);       // Maximum regret value
+console.log(result.algorithm);       // Algorithm name
+console.log(result.objective);       // Objective description
 ```
 
 **Pareto Weighted Scoring Usage**:
@@ -189,8 +203,8 @@ const recommendations = selectParetoK(trails, groupMembers, 5, weights);
 - **Average Satisfaction**: Overall group happiness (0-100%)
 - **Fairness Score**: Minimum member satisfaction (0-100%)
 - **Consensus Degree**: Group agreement level (0-100%)
+- **Max Regret**: Maximum group dissatisfaction (core Greedy metric)
 - **Diversity Score**: Trail variety percentage (0-100%)
-- **Regret Score**: Maximum group dissatisfaction (0-100%)
 
 ### Group-Specific Recommendations
 - **Family**: Safety, accessibility, fairness across ages
@@ -224,6 +238,17 @@ node test_comparison.js
 - **Greedy MinMax Regret**: O(k × n × m)
 - **Pareto Weighted Scoring**: O(n² + k × n × m)
 - Where: k = trails to select, n = total trails, m = group size
+
+### Algorithm Strengths
+- **Greedy MinMax Regret**: 
+  - ✅ Higher average satisfaction
+  - ✅ Better fairness scores
+  - ✅ Lower maximum regret
+  - ✅ Ideal for diverse groups
+- **Pareto Weighted Scoring**:
+  - ✅ Better consensus building
+  - ✅ Multi-objective optimization
+  - ✅ Ideal for similar preferences
 
 ### Scalability
 - **Trail Dataset**: 200+ Pacific Northwest trails
