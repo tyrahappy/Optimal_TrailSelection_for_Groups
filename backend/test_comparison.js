@@ -1,247 +1,22 @@
-const { greedyMinMaxRegret, calculateRecommendationMetrics } = require('./greedyMinMaxRegret');
+const { greedyMinMaxRegret } = require('./greedyMinMaxRegret');
 const { selectParetoK } = require('./paretoWeightedScoring');
+const { calculateGroupSatisfaction, individualUtility } = require('./utils/groupSatisfaction');
 
 console.log("=== Algorithm Comparison Test ===\n");
 
-// Three different group scenarios: Family, Friends, Expert
-const scenarios = [
-  {
-    name: "Scenario 1: Family Group",
-    description: "Family with diverse ages and fitness levels - parents, children, grandparents",
-    groupPreferences: [
-      {
-        name: "Dad",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 6,
-        max_time: 3,
-        max_elevation: 300,
-        distance_weight: 0.3,
-        time_weight: 0.3,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.2,
-        preferences: ["mountain", "lake", "forest"]
-      },
-      {
-        name: "Mom",
-        acceptable_difficulties: ['Easy'],
-        preferred_distance: 4,
-        max_time: 2,
-        max_elevation: 200,
-        distance_weight: 0.35,
-        time_weight: 0.35,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.1,
-        preferences: ["lake", "forest", "beach"]
-      },
-      {
-        name: "Teenager",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 8,
-        max_time: 4,
-        max_elevation: 500,
-        distance_weight: 0.25,
-        time_weight: 0.25,
-        elevation_weight: 0.25,
-        difficulty_weight: 0.25,
-        preferences: ["mountain", "waterfall", "alpine"]
-      },
-      {
-        name: "Grandparent",
-        acceptable_difficulties: ['Easy'],
-        preferred_distance: 2,
-        max_time: 1.5,
-        max_elevation: 100,
-        distance_weight: 0.4,
-        time_weight: 0.35,
-        elevation_weight: 0.2,
-        difficulty_weight: 0.05,
-        preferences: ["lake", "forest", "park"]
-      }
-    ]
-  },
-  {
-    name: "Scenario 2: Friends Group",
-    description: "Group of friends with similar interests and fitness levels",
-    groupPreferences: [
-      {
-        name: "Alex",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 8,
-        max_time: 4,
-        max_elevation: 600,
-        distance_weight: 0.25,
-        time_weight: 0.25,
-        elevation_weight: 0.25,
-        difficulty_weight: 0.25,
-        preferences: ["lake", "mountain", "forest"]
-      },
-      {
-        name: "Sam",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 7,
-        max_time: 3.5,
-        max_elevation: 550,
-        distance_weight: 0.25,
-        time_weight: 0.25,
-        elevation_weight: 0.25,
-        difficulty_weight: 0.25,
-        preferences: ["lake", "ocean", "beach"]
-      },
-      {
-        name: "Jordan",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 9,
-        max_time: 4.5,
-        max_elevation: 650,
-        distance_weight: 0.25,
-        time_weight: 0.25,
-        elevation_weight: 0.25,
-        difficulty_weight: 0.25,
-        preferences: ["lake", "waterfall", "forest"]
-      },
-      {
-        name: "Taylor",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 6,
-        max_time: 3,
-        max_elevation: 500,
-        distance_weight: 0.25,
-        time_weight: 0.25,
-        elevation_weight: 0.25,
-        difficulty_weight: 0.25,
-        preferences: ["mountain", "lake", "alpine"]
-      }
-    ]
-  },
-  {
-    name: "Scenario 3: Expert Group",
-    description: "Experienced hikers with diverse preferences and high fitness levels",
-    groupPreferences: [
-      {
-        name: "Mountain Expert",
-        acceptable_difficulties: ['Moderate', 'Hard'],
-        preferred_distance: 15,
-        max_time: 8,
-        max_elevation: 1500,
-        distance_weight: 0.2,
-        time_weight: 0.2,
-        elevation_weight: 0.35,
-        difficulty_weight: 0.25,
-        preferences: ["mountain", "alpine", "glacier"]
-      },
-      {
-        name: "Photography Expert",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 10,
-        max_time: 6,
-        max_elevation: 800,
-        distance_weight: 0.25,
-        time_weight: 0.35,
-        elevation_weight: 0.25,
-        difficulty_weight: 0.15,
-        preferences: ["waterfall", "lake", "alpine"]
-      },
-      {
-        name: "Wildlife Expert",
-        acceptable_difficulties: ['Easy', 'Moderate'],
-        preferred_distance: 12,
-        max_time: 7,
-        max_elevation: 1000,
-        distance_weight: 0.3,
-        time_weight: 0.3,
-        elevation_weight: 0.25,
-        difficulty_weight: 0.15,
-        preferences: ["forest", "lake", "wildlife"]
-      },
-      {
-        name: "Adventure Expert",
-        acceptable_difficulties: ['Hard'],
-        preferred_distance: 20,
-        max_time: 10,
-        max_elevation: 2000,
-        distance_weight: 0.25,
-        time_weight: 0.25,
-        elevation_weight: 0.35,
-        difficulty_weight: 0.15,
-        preferences: ["mountain", "glacier", "alpine"]
-      }
-    ]
-  }
-];
-
-// Same sample trails as test_greedy.js
+// Sample trail data (same as before)
 const sampleTrails = [
   {
     trail_id: "BC_001",
-    trail_name: "Stanley Park Seawall",
-    location: "Vancouver, BC",
-    difficulty: "Easy",
-    distance_km: 8.9,
-    estimated_time_hours: 2.5,
-    elevation_gain_m: 50,
-    rating: 4.5,
-    scenery_types: ["Ocean views", "City skyline", "Parks"],
-    trail_type: "Loop"
-  },
-  {
-    trail_id: "BC_027",
-    trail_name: "Quarry Rock",
-    location: "North Vancouver, BC",
-    difficulty: "Easy",
-    distance_km: 3.8,
-    estimated_time_hours: 1.2,
-    elevation_gain_m: 100,
-    rating: 4.6,
-    scenery_types: ["Ocean views", "Forest"],
-    trail_type: "Out & Back"
-  },
-  {
-    trail_id: "BC_068",
-    trail_name: "Lost Lake Loop",
-    location: "Whistler, BC",
-    difficulty: "Easy",
-    distance_km: 5.0,
-    estimated_time_hours: 1.5,
-    elevation_gain_m: 30,
-    rating: 4.4,
-    scenery_types: ["Lake", "Forest"],
-    trail_type: "Loop"
-  },
-  {
-    trail_id: "BC_082",
     trail_name: "Alice Lake",
     location: "Squamish, BC",
     difficulty: "Easy",
-    distance_km: 6.0,
+    distance_km: 4.5,
     estimated_time_hours: 2.0,
-    elevation_gain_m: 50,
+    elevation_gain_m: 150,
     rating: 4.4,
     scenery_types: ["Lake", "Forest"],
     trail_type: "Loop"
-  },
-  {
-    trail_id: "BC_031",
-    trail_name: "Rice Lake Loop",
-    location: "North Vancouver, BC",
-    difficulty: "Easy",
-    distance_km: 2.4,
-    estimated_time_hours: 0.8,
-    elevation_gain_m: 20,
-    rating: 4.3,
-    scenery_types: ["Lake", "Forest"],
-    trail_type: "Loop"
-  },
-  {
-    trail_id: "BC_021",
-    trail_name: "Grouse Grind",
-    location: "North Vancouver, BC",
-    difficulty: "Hard",
-    distance_km: 2.9,
-    estimated_time_hours: 1.5,
-    elevation_gain_m: 850,
-    rating: 4.1,
-    scenery_types: ["Mountain views", "Forest"],
-    trail_type: "Out & Back"
   },
   {
     trail_id: "BC_075",
@@ -290,10 +65,248 @@ const sampleTrails = [
     rating: 4.7,
     scenery_types: ["Beach", "Ocean"],
     trail_type: "Out & Back"
+  },
+  {
+    trail_id: "BC_002",
+    trail_name: "Quarry Rock",
+    location: "North Vancouver, BC",
+    difficulty: "Easy",
+    distance_km: 3.5,
+    estimated_time_hours: 1.5,
+    elevation_gain_m: 200,
+    rating: 4.6,
+    scenery_types: ["Ocean views", "Forest"],
+    trail_type: "Out & Back"
+  },
+  {
+    trail_id: "BC_003",
+    trail_name: "Rice Lake Loop",
+    location: "North Vancouver, BC",
+    difficulty: "Easy",
+    distance_km: 3.0,
+    estimated_time_hours: 1.0,
+    elevation_gain_m: 50,
+    rating: 4.3,
+    scenery_types: ["Lake", "Forest"],
+    trail_type: "Loop"
+  },
+  {
+    trail_id: "BC_004",
+    trail_name: "Lost Lake Loop",
+    location: "Whistler, BC",
+    difficulty: "Easy",
+    distance_km: 5.0,
+    estimated_time_hours: 2.0,
+    elevation_gain_m: 100,
+    rating: 4.4,
+    scenery_types: ["Lake", "Forest"],
+    trail_type: "Loop"
+  },
+  {
+    trail_id: "BC_005",
+    trail_name: "Grouse Grind",
+    location: "North Vancouver, BC",
+    difficulty: "Hard",
+    distance_km: 2.9,
+    estimated_time_hours: 1.5,
+    elevation_gain_m: 853,
+    rating: 4.1,
+    scenery_types: ["Mountain views", "Forest"],
+    trail_type: "Out & Back"
+  },
+  {
+    trail_id: "BC_006",
+    trail_name: "Stanley Park Seawall",
+    location: "Vancouver, BC",
+    difficulty: "Easy",
+    distance_km: 10.0,
+    estimated_time_hours: 3.0,
+    elevation_gain_m: 50,
+    rating: 4.5,
+    scenery_types: ["Ocean views", "City skyline", "Parks"],
+    trail_type: "Loop"
   }
 ];
 
-// Algorithm configurations
+// Test scenarios with complete methodology format
+const scenarios = [
+  {
+    name: "Scenario 1: Family Group",
+    description: "Family with diverse ages and fitness levels - parents, children, grandparents",
+    groupPreferences: [
+      {
+        name: "Dad",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 6,
+        max_time: 3,
+        max_elevation: 300,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.2,
+        difficulty_weight: 0.15,
+        preferred_scenery_types: ["mountain", "lake", "forest"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Mom",
+        acceptable_difficulties: ['Easy'],
+        preferred_distance: 4,
+        max_time: 2,
+        max_elevation: 200,
+        distance_weight: 0.3,
+        time_weight: 0.3,
+        elevation_weight: 0.2,
+        difficulty_weight: 0.1,
+        preferred_scenery_types: ["lake", "forest", "beach"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Teenager",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 8,
+        max_time: 4,
+        max_elevation: 500,
+        distance_weight: 0.2,
+        time_weight: 0.2,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
+        preferred_scenery_types: ["mountain", "waterfall", "alpine"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Grandparent",
+        acceptable_difficulties: ['Easy'],
+        preferred_distance: 2,
+        max_time: 1.5,
+        max_elevation: 100,
+        distance_weight: 0.4,
+        time_weight: 0.3,
+        elevation_weight: 0.2,
+        difficulty_weight: 0.05,
+        preferred_scenery_types: ["lake", "forest", "park"],
+        scenery_weight: 0.2
+      }
+    ]
+  },
+  {
+    name: "Scenario 2: Friends Group",
+    description: "Group of friends with similar interests and fitness levels",
+    groupPreferences: [
+      {
+        name: "Alex",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 8,
+        max_time: 4,
+        max_elevation: 600,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
+        preferred_scenery_types: ["lake", "mountain", "forest"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Sam",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 6,
+        max_time: 3,
+        max_elevation: 400,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
+        preferred_scenery_types: ["lake", "ocean", "beach"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Jordan",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 7,
+        max_time: 3.5,
+        max_elevation: 500,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
+        preferred_scenery_types: ["lake", "waterfall", "forest"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Taylor",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 9,
+        max_time: 4.5,
+        max_elevation: 700,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.25,
+        preferred_scenery_types: ["mountain", "lake", "alpine"],
+        scenery_weight: 0.2
+      }
+    ]
+  },
+  {
+    name: "Scenario 3: Expert Group",
+    description: "Experienced hikers with diverse preferences and high fitness levels",
+    groupPreferences: [
+      {
+        name: "Mountain Expert",
+        acceptable_difficulties: ['Moderate', 'Hard'],
+        preferred_distance: 15,
+        max_time: 8,
+        max_elevation: 1200,
+        distance_weight: 0.2,
+        time_weight: 0.2,
+        elevation_weight: 0.35,
+        difficulty_weight: 0.25,
+        preferred_scenery_types: ["mountain", "alpine", "glacier"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Photography Expert",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 10,
+        max_time: 5,
+        max_elevation: 800,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.15,
+        preferred_scenery_types: ["waterfall", "lake", "alpine"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Wildlife Expert",
+        acceptable_difficulties: ['Easy', 'Moderate'],
+        preferred_distance: 8,
+        max_time: 4,
+        max_elevation: 600,
+        distance_weight: 0.25,
+        time_weight: 0.25,
+        elevation_weight: 0.25,
+        difficulty_weight: 0.15,
+        preferred_scenery_types: ["forest", "lake", "wildlife"],
+        scenery_weight: 0.2
+      },
+      {
+        name: "Adventure Expert",
+        acceptable_difficulties: ['Moderate', 'Hard'],
+        preferred_distance: 20,
+        max_time: 10,
+        max_elevation: 1500,
+        distance_weight: 0.15,
+        time_weight: 0.15,
+        elevation_weight: 0.35,
+        difficulty_weight: 0.15,
+        preferred_scenery_types: ["mountain", "glacier", "alpine"],
+        scenery_weight: 0.2
+      }
+    ]
+  }
+];
+
+// Algorithm options
 const greedyOptions = {
   considerDiversity: true,
   diversityWeight: 0.3,
@@ -306,12 +319,52 @@ const paretoOptions = {
   cons: 0.3
 };
 
-// Comparison metrics function
-function compareAlgorithms(greedyResults, paretoResults, scenario, groupPreferences) {
+// Direct calculation using utils
+function calculateDirectMetrics(selectedTrails, groupMembers) {
+  if (selectedTrails.length === 0) return {};
+  
+  // Basic statistics
+  const averageRating = selectedTrails.reduce((sum, t) => sum + t.rating, 0) / selectedTrails.length;
+  const averageDistance = selectedTrails.reduce((sum, t) => sum + t.distance_km, 0) / selectedTrails.length;
+  
+  // Group satisfaction for each trail
+  const groupSatisfactions = selectedTrails.map(trail => 
+    calculateGroupSatisfaction(trail, groupMembers)
+  );
+  
+  // Average group satisfaction metrics
+  const averageGroupSatisfaction = groupSatisfactions.reduce((sum, g) => sum + g.avg_satisfaction, 0) / selectedTrails.length;
+  const fairnessScore = groupSatisfactions.reduce((sum, g) => sum + g.fairness_score, 0) / selectedTrails.length;
+  const consensusDegree = groupSatisfactions.reduce((sum, g) => sum + g.consensus_degree, 0) / selectedTrails.length;
+  
+  // Individual match percentages
+  const groupMatchPercentages = groupMembers.map(member => {
+    const matchingTrails = selectedTrails.filter(trail => {
+      const utility = individualUtility(member, trail);
+      return utility > 50;
+    });
+    return Math.round((matchingTrails.length / selectedTrails.length) * 100);
+  });
+  
+  return {
+    averageRating,
+    averageDistance,
+    averageGroupSatisfaction,
+    fairnessScore,
+    consensusDegree,
+    groupMatchPercentages
+  };
+}
+
+// Comparison function using direct utils calculations
+function compareAlgorithms(greedyResults, paretoResults, scenario, groupMembers) {
+  const greedyMetrics = calculateDirectMetrics(greedyResults, groupMembers);
+  const paretoMetrics = calculateDirectMetrics(paretoResults, groupMembers);
+  
   const comparison = {
     scenario: scenario.name,
-    greedyMetrics: calculateRecommendationMetrics(greedyResults, groupPreferences),
-    paretoMetrics: calculateRecommendationMetrics(paretoResults, groupPreferences),
+    greedyMetrics,
+    paretoMetrics,
     
     // Trail overlap analysis
     overlap: {
@@ -336,42 +389,33 @@ function compareAlgorithms(greedyResults, paretoResults, scenario, groupPreferen
   comparison.overlap.count = greedyTrailIds.filter(id => paretoTrailIds.includes(id)).length;
   comparison.overlap.trails = greedyResults.filter(trail => paretoTrailIds.includes(trail.trail_id));
   
-  // Analyze strengths
-  if (comparison.greedyMetrics.diversityScore > comparison.paretoMetrics.diversityScore) {
-    comparison.strengths.greedy.push("Better diversity");
-  } else {
-    comparison.strengths.pareto.push("Better diversity");
-  }
-  
-  if (comparison.greedyMetrics.regretScore < comparison.paretoMetrics.regretScore) {
-    comparison.strengths.greedy.push("Lower regret");
-  } else {
-    comparison.strengths.pareto.push("Lower regret");
-  }
-  
-  if (comparison.greedyMetrics.averageGroupSatisfaction > comparison.paretoMetrics.averageGroupSatisfaction) {
+  // Analyze strengths using direct metrics
+  if (greedyMetrics.averageGroupSatisfaction > paretoMetrics.averageGroupSatisfaction) {
     comparison.strengths.greedy.push("Higher average satisfaction");
   } else {
     comparison.strengths.pareto.push("Higher average satisfaction");
   }
   
-  if (comparison.greedyMetrics.fairnessScore > comparison.paretoMetrics.fairnessScore) {
+  if (greedyMetrics.fairnessScore > paretoMetrics.fairnessScore) {
     comparison.strengths.greedy.push("Better fairness");
   } else {
     comparison.strengths.pareto.push("Better fairness");
   }
   
+  if (greedyMetrics.consensusDegree > paretoMetrics.consensusDegree) {
+    comparison.strengths.greedy.push("Better consensus");
+  } else {
+    comparison.strengths.pareto.push("Better consensus");
+  }
+  
   // Determine recommendation based on scenario type
   if (scenario.name.includes("Family")) {
-    // Family groups need fairness and safety - Greedy is better for diverse ages
     comparison.recommendation = comparison.strengths.greedy.length > comparison.strengths.pareto.length ? 
       "Greedy MinMax Regret (Better for family fairness)" : "Pareto Weighted Scoring (Better for family consensus)";
   } else if (scenario.name.includes("Friends")) {
-    // Friends groups can compromise more - Pareto is better for similar interests
     comparison.recommendation = comparison.strengths.pareto.length > comparison.strengths.greedy.length ? 
       "Pareto Weighted Scoring (Better for friend consensus)" : "Greedy MinMax Regret (Better for friend fairness)";
   } else if (scenario.name.includes("Expert")) {
-    // Expert groups have diverse but informed preferences - depends on metrics
     comparison.recommendation = comparison.strengths.greedy.length > comparison.strengths.pareto.length ? 
       "Greedy MinMax Regret (Better for expert diversity)" : "Pareto Weighted Scoring (Better for expert optimization)";
   } else {
@@ -387,14 +431,14 @@ scenarios.forEach((scenario, scenarioIndex) => {
   console.log(`   ${scenario.description}`);
   console.log("\n   Group Members:");
   scenario.groupPreferences.forEach(member => {
-    console.log(`   - ${member.name}: ${member.preferences.join(', ')}`);
+    console.log(`   - ${member.name}: ${member.preferred_scenery_types.join(', ')}`);
   });
   
   // Run both algorithms
   const greedyResults = greedyMinMaxRegret(sampleTrails, scenario.groupPreferences, 5, greedyOptions);
   const paretoResults = selectParetoK(sampleTrails, scenario.groupPreferences, 5, paretoOptions);
   
-  // Compare results
+  // Compare results using direct utils calculations
   const comparison = compareAlgorithms(greedyResults, paretoResults, scenario, scenario.groupPreferences);
   
   console.log("\n   === ALGORITHM COMPARISON ===");
@@ -415,18 +459,16 @@ scenarios.forEach((scenario, scenarioIndex) => {
   console.log("\n   Greedy Metrics:");
   console.log(`   - Average Rating: ${comparison.greedyMetrics.averageRating.toFixed(1)}/5.0`);
   console.log(`   - Average Distance: ${comparison.greedyMetrics.averageDistance.toFixed(1)}km`);
-  console.log(`   - Diversity Score: ${(comparison.greedyMetrics.diversityScore * 100).toFixed(0)}%`);
-  console.log(`   - Regret Score: ${comparison.greedyMetrics.regretScore.toFixed(2)}`);
   console.log(`   - Average Satisfaction: ${comparison.greedyMetrics.averageGroupSatisfaction.toFixed(1)}`);
   console.log(`   - Fairness Score: ${comparison.greedyMetrics.fairnessScore.toFixed(1)}`);
+  console.log(`   - Consensus Degree: ${(comparison.greedyMetrics.consensusDegree * 100).toFixed(0)}%`);
   
   console.log("\n   Pareto Metrics:");
   console.log(`   - Average Rating: ${comparison.paretoMetrics.averageRating.toFixed(1)}/5.0`);
   console.log(`   - Average Distance: ${comparison.paretoMetrics.averageDistance.toFixed(1)}km`);
-  console.log(`   - Diversity Score: ${(comparison.paretoMetrics.diversityScore * 100).toFixed(0)}%`);
-  console.log(`   - Regret Score: ${comparison.paretoMetrics.regretScore.toFixed(2)}`);
   console.log(`   - Average Satisfaction: ${comparison.paretoMetrics.averageGroupSatisfaction.toFixed(1)}`);
   console.log(`   - Fairness Score: ${comparison.paretoMetrics.fairnessScore.toFixed(1)}`);
+  console.log(`   - Consensus Degree: ${(comparison.paretoMetrics.consensusDegree * 100).toFixed(0)}%`);
   
   console.log("\n   === ALGORITHM STRENGTHS ===");
   console.log("   Greedy MinMax Regret:");
