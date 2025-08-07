@@ -3,7 +3,10 @@ const { calculateGroupSatisfaction, individualUtility } = require('./utils/group
 
 console.log("=== Greedy MinMax Regret Algorithm Demo ===\n");
 
-// Simulate different group preference scenarios with complete methodology format
+/**
+ * Test scenarios for Greedy MinMax Regret algorithm
+ * Each scenario represents different group preference patterns to test algorithm robustness
+ */
 const scenarios = [
   {
     name: "Scenario 1: Diverse Preferences",

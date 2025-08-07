@@ -5,13 +5,12 @@ const csv = require('csv-parser');
 const path = require('path');
 const { greedyMinMaxRegret } = require('./greedyMinMaxRegret');
 
-
 const { calculateGroupSatisfaction } = require('./utils/groupSatisfaction');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+// Middleware configuration
 app.use(cors({
   origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true,
@@ -23,7 +22,11 @@ app.use(express.json());
 // Global variable to store trails data
 let trailsData = [];
 
-// Load trails data from CSV
+/**
+ * Load trails data from CSV file
+ * Parses CSV data and converts string values to appropriate types
+ * @returns {Promise<Array>} - Promise resolving to array of trail objects
+ */
 const loadTrailsData = () => {
   return new Promise((resolve, reject) => {
     const results = [];
@@ -53,7 +56,12 @@ const loadTrailsData = () => {
 // Initialize data on server start
 loadTrailsData().catch(console.error);
 
-// Utility function to calculate group match percentage for a trail
+/**
+ * Calculate group match percentage for a trail based on member preferences
+ * @param {Object} trail - Trail object with scenery types
+ * @param {Array} groupPreferences - Array of member preference objects
+ * @returns {number} - Match percentage (0-100)
+ */
 const calculateGroupMatch = (trail, groupPreferences) => {
   const matchCount = groupPreferences.reduce((sum, member) => {
     const memberMatch = member.preferences.some(pref =>
@@ -67,14 +75,21 @@ const calculateGroupMatch = (trail, groupPreferences) => {
   return (matchCount / groupPreferences.length) * 100;
 };
 
-// Routes
+// ==================== API ROUTES ====================
 
-// Get all trails
+/**
+ * GET /api/trails
+ * Retrieve all available trails
+ */
 app.get('/api/trails', (req, res) => {
   res.json(trailsData);
 });
 
-// Get filtered trails
+/**
+ * GET /api/trails/filter
+ * Retrieve filtered trails based on query parameters
+ * Supports filtering by difficulty, distance, time, elevation, scenery, and search terms
+ */
 app.get('/api/trails/filter', (req, res) => {
   const {
     difficulty,
@@ -144,7 +159,11 @@ app.get('/api/trails/filter', (req, res) => {
   res.json(filteredTrails);
 });
 
-// Get recommended trails using greedy minmax regret algorithm with complete methodology
+/**
+ * POST /api/trails/recommend
+ * Retrieve trail recommendations using the greedy minmax regret algorithm
+ * with complete methodology for a group of preferences.
+ */
 app.post('/api/trails/recommend', (req, res) => {
   try {
     const { groupPreferences, filters = {}, k = 5 } = req.body;

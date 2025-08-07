@@ -1,6 +1,12 @@
 const { calculateGroupSatisfaction } = require('./utils/groupSatisfaction');
 
-/** Build objective vector used for Pareto comparison (larger is better) */
+/**
+ * Build objective vector used for Pareto comparison (larger is better)
+ * Creates a 6-dimensional objective vector for multi-objective optimization
+ * @param {Object} trail - Trail object to evaluate
+ * @param {Array} group - Group member preferences
+ * @returns {Array} - 6-dimensional objective vector [satisfaction, fairness, accessibility, distance, time, consensus]
+ */
 function getObjectives(trail, group) {
   const g = calculateGroupSatisfaction(trail, group);
   const access = { Easy: 1.0, Moderate: 0.7, Hard: 0.4 }[trail.difficulty] || 0.5;
@@ -9,7 +15,13 @@ function getObjectives(trail, group) {
   return [g.avg_satisfaction, g.fairness_score, access, dist, time, g.consensus_degree];
 }
 
-/** a dominates b if >= on all and > on at least one */
+/**
+ * Check if solution A dominates solution B in Pareto sense
+ * A dominates B if A >= B on all objectives and A > B on at least one
+ * @param {Array} a - Objective vector of solution A
+ * @param {Array} b - Objective vector of solution B
+ * @returns {boolean} - True if A dominates B
+ */
 function dominates(a, b) {
   let strict = false;
   for (let i = 0; i < a.length; i++) {
@@ -19,7 +31,13 @@ function dominates(a, b) {
   return strict;
 }
 
-/** Phase 1: Pareto frontier */
+/**
+ * Phase 1: Find Pareto frontier (non-dominated solutions)
+ * Identifies all trails that are not dominated by any other trail
+ * @param {Array} trails - All available trails
+ * @param {Array} group - Group member preferences
+ * @returns {Array} - Array of Pareto optimal trails
+ */
 function findParetoFrontier(trails, group) {
   const objs = trails.map(t => ({ trail: t, obj: getObjectives(t, group) }));
   const frontier = [];
@@ -34,7 +52,15 @@ function findParetoFrontier(trails, group) {
   return frontier;
 }
 
-/** Phase 2: weighted scoring on Pareto set (match methodology weights) */
+/**
+ * Phase 2: Weighted scoring on Pareto set (match methodology weights)
+ * Applies methodology weights to Pareto optimal trails for final selection
+ * @param {Array} paretoSet - Pareto optimal trails
+ * @param {Array} group - Group member preferences
+ * @param {number} k - Number of trails to select
+ * @param {Object} w - Weight configuration {avg, min, cons}
+ * @returns {Array} - Top-k trails from weighted Pareto set
+ */
 function weightedSelection(paretoSet, group, k = 5, w = { avg:0.4, min:0.3, cons:0.3 }) {
   if (paretoSet.length <= k) return paretoSet;
 
@@ -48,7 +74,15 @@ function weightedSelection(paretoSet, group, k = 5, w = { avg:0.4, min:0.3, cons
   return scored.slice(0, k).map(s => s.trail);
 }
 
-/** Convenience wrapper: full pipeline */
+/**
+ * Convenience wrapper: full Pareto Weighted Scoring pipeline
+ * Combines Pareto frontier identification and weighted selection
+ * @param {Array} trails - All available trails
+ * @param {Array} group - Group member preferences
+ * @param {number} k - Number of trails to select
+ * @param {Object} weights - Weight configuration for scoring
+ * @returns {Array} - Final selected trails using Pareto Weighted Scoring
+ */
 function selectParetoK(trails, group, k = 5, weights) {
   const pareto = findParetoFrontier(trails, group);
   return weightedSelection(pareto, group, k, weights);
